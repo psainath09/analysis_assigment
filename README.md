@@ -22,15 +22,12 @@ docker build -t klm-network-analysis .
 Run the Container:
 Use the following command to start the application:
 
-docker run klm-network-analysis
+docker run klm-network-analysis [parameters]
 
-Passing Arguments:
+Example Passing Arguments:
 To pass arguments to the Python script, use:
 
-docker run --rm klm-network-analysis \
-    --input-path ./data \
-    --start-date 2019-03-01 \
-    --end-date 2019-03-31
+docker run --rm klm-network-analysis --input-path ./data --start-date 2019-03-01 --end-date 2019-03-31
 
 View Output:
 The output files will be generated in the /app/output directory within the container. To copy them to your host system, use:
@@ -74,9 +71,10 @@ Run the PySpark Application:
 Execute the script inside the Spark Worker container:
 
 docker exec -it spark-worker python3 /app/src/main/data_analysis.py \
-    --input-path ./data.json \
-    --start-date 2019-03-01 \
-    --end-date 2019-03-31
+    --input_path ./data \
+    --start_date 2023-01-01 \
+    --end_date 2023-12-31
+
 
 View Output:
 The output files will be saved in the ./output directory on the host system.
