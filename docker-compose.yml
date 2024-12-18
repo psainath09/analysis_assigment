@@ -1,0 +1,57 @@
+services:
+  spark-master:
+    image: bitnami/spark:3.4.1
+    container_name: spark-master
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_USER=spark
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./output:/app/output
+
+  spark-worker:
+    image: bitnami/spark:3.4.1
+    container_name: spark-worker
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_WORKER_CORES=2
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./output:/app/output
+    depends_on:
+      - spark-master
+    command: >
+      bash -c "pip install py4j pyspark &&
+               tail -f /dev/null"
+
+  hdfs-namenode:
+      image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+      environment:
+        - CLUSTER_NAME=klm-network
+      volumes:
+        - ./hdfs_data/namenode:/hadoop/dfs/name
+      ports:
+        - "9870:9870"
+
+  hdfs-datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    depends_on:
+      - hdfs-namenode
+    volumes:
+      - ./hdfs_data/datanode:/hadoop/dfs/data
+    environment:
+      - SERVICE_PRECONDITION=hdfs-namenode:9870
