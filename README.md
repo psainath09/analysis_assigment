@@ -68,14 +68,15 @@ Spark Master UI: http://localhost:8080
 HDFS NameNode UI: http://localhost:9870
 
 Run the PySpark Application:
-Execute the script inside the Spark Worker container:
+Execute the script inside the container:
 
-docker exec -it spark-worker python3 /app/src/main/data_analysis.py \
-    --input_path ./data \
-    --start_date 2023-01-01 \
-    --end_date 2023-12-31
+docker exec -it spark-master /bin/bash
 
+cd /app
+
+spark-submit /app/src/main/data_analysis.py --input_path ./data --start_date 2019-03-01 --end_date 2019-03-31
 
 View Output:
 The output files will be saved in the ./output directory on the host system.
 
+docker cp <container-id>:/app/output ./output
