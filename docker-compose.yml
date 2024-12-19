@@ -15,6 +15,8 @@ services:
       - ./src:/app/src
       - ./data:/app/data
       - ./output:/app/output
+    networks:
+      - hadoop_network
 
   spark-worker:
     image: bitnami/spark:3.4.1
@@ -32,19 +34,24 @@ services:
       - ./output:/app/output
     depends_on:
       - spark-master
+    networks:
+      - hadoop_network
     command: >
       bash -c "pip install py4j pyspark &&
                tail -f /dev/null"
 
   hdfs-namenode:
-      image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+      image: bde2020/hadoop-namenode
       container_name: hdfs-namenode
       hostname: namenode
       environment:
         - CLUSTER_NAME=hadoop-cluster
         - CORE_CONF_fs_defaultFS=hdfs://hdfs-namenode:9000
+        - HDFS_CONF_dfs_namenode_datanode_registration_ip___hostname___check=false
       volumes:
         - ./hdfs_data/namenode:/hadoop/dfs/name
+      networks:
+        - hadoop_network
       ports:
         - "9870:9870"
         - "9000:9000"
@@ -55,7 +62,7 @@ services:
         retries: 3
 
   hdfs-datanode:
-    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    image: bde2020/hadoop-namenode
     container_name: hdfs-datanode
     hostname: datanode
     depends_on:
@@ -63,10 +70,17 @@ services:
     environment:
       - CORE_CONF_fs_defaultFS=hdfs://hdfs-namenode:9000
       - SERVICE_PRECONDITION=hdfs-namenode:9870
+      - HDFS_CONF_dfs_datanode_use_datanode_hostname=false
     volumes:
       - ./hdfs_data/datanode:/hadoop/dfs/data
+    networks:
+      - hadoop_network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9864"]
       interval: 30s
       timeout: 10s
       retries: 3
+
+networks:
+  hadoop_network:
+    name: hadoop_network

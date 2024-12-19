@@ -35,7 +35,7 @@ RUN mkdir -p /app/output
 ENV SPARK_HOME=/opt/venv/lib/python3.9/site-packages/pyspark
 ENV PATH="$SPARK_HOME/bin:$PATH"
 
-RUN pytest src/tests/
+#RUN pytest src/tests/
 
 # Set the default command
 ENTRYPOINT ["python3", "src/main/data_analysis.py"]

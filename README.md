@@ -72,8 +72,8 @@ HDFS NameNode UI: http://localhost:9870
 
 ##### **For local input:**
 
+
 `docker exec -it spark-master /opt/bitnami/spark/bin/spark-submit \
-    --master spark://spark-master:7077 \
     /app/src/main/data_analysis.py \
     --input_path file:///app/data \
     --start_date 2019-03-01 \
@@ -86,11 +86,11 @@ copy the data to hdfs namenode ,
 `docker cp ./data/ hdfs-namenode:/data
 
 docker exec -it hdfs-namenode bash
+
 `
 docker exec -it spark-master /opt/bitnami/spark/bin/spark-submit \
-    --master spark://spark-master:7077 \
     /app/src/main/data_analysis.py \
-    --input_path hdfs://hdfs-namenode:9000/data \
+    --input_path hdfs://hdfs-namenode:9000/app/data \
     --start_date 2019-03-01 \
     --end_date 2019-03-31
 `

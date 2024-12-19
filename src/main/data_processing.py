@@ -25,7 +25,6 @@ class DataProcessing:
             F.col("country"), F.col("season"), F.col("day_of_week")
         ).agg(
             F.countDistinct("passenger_uci").alias("passenger_count"),
-            F.avg("passenger_age").alias("avg_age"),
-            F.sum(F.when(F.col("passenger_type") == ("ADT"), 1).otherwise(0)).alias("adult_count"),
-            F.sum(F.when(F.col("passenger_type") == ("CHD"), 1).otherwise(0)).alias("child_count")
+            F.avg("passenger_age").alias("avg_age")
         ).orderBy("passenger_count", ascending=False)
+

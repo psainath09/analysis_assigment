@@ -38,8 +38,10 @@ class KLMNetworkAnalytics:
             print("Data validation failed. Please check input data..")
             print("Age has negative values and correcting with mean value")
             mean_age = bookings.filter(F.col("passenger_age") >= 0).agg({"passenger_age": "mean"}).collect()[0][0]
-            bookings = bookings.withColumn("passenger_age", F.when(F.col("passenger_age") < 0, F.lit(mean_age)).otherwise(F.col("passenger_age")))
-
+            bookings = bookings.withColumn(
+                "passenger_age",
+                F.when((F.col("passenger_age") < 0) | (F.col("passenger_age").isNull()), F.lit(mean_age))
+                    .otherwise(F.col("passenger_age")))
         # Filter KLM flights and mentioned dates
         klm_bookings = self.ingestion.filter_klm_flights(bookings, start_date,end_date)
 
