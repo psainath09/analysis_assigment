@@ -22,8 +22,6 @@ services:
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
-      - SPARK_WORKER_MEMORY=2G
-      - SPARK_WORKER_CORES=2
       - SPARK_RPC_AUTHENTICATION_ENABLED=no
       - SPARK_RPC_ENCRYPTION_ENABLED=no
       - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
@@ -40,18 +38,35 @@ services:
 
   hdfs-namenode:
       image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+      container_name: hdfs-namenode
+      hostname: namenode
       environment:
-        - CLUSTER_NAME=klm-network
+        - CLUSTER_NAME=hadoop-cluster
+        - CORE_CONF_fs_defaultFS=hdfs://hdfs-namenode:9000
       volumes:
         - ./hdfs_data/namenode:/hadoop/dfs/name
       ports:
         - "9870:9870"
+        - "9000:9000"
+      healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:9870"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
 
   hdfs-datanode:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: hdfs-datanode
+    hostname: datanode
     depends_on:
       - hdfs-namenode
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://hdfs-namenode:9000
+      - SERVICE_PRECONDITION=hdfs-namenode:9870
     volumes:
       - ./hdfs_data/datanode:/hadoop/dfs/data
-    environment:
-      - SERVICE_PRECONDITION=hdfs-namenode:9870
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9864"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

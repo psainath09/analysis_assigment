@@ -77,7 +77,7 @@ class KLMNetworkAnalytics:
         destination_analysis.show()
 
         # Optional: Write results to output
-        destination_analysis.write.csv(f"{output_path}/report.csv",mode="overwrite", header=True)
+        destination_analysis.write.csv(f"{output_path}/report/",mode="overwrite", header=True)
 
     def close(self):
         """
